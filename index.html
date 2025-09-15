@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blade Ball AI Raffle Predictor - Mermaid Spins</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-url: url('assets/back.jpg');
+            --primary-color-start: #6a82fb;
+            --primary-color-end: #fc5c7d;
+            --accent-color-start: #00c9ff;
+            --accent-color-end: #92fe9d;
+            --font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(15, 10, 40, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --radius-md: 16px;
+            --radius-lg: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-image: var(--bg-url);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            overflow-y: auto;
+            animation: fadeIn 0.8s ease-out;
+            padding: 2rem 1rem;
+        }
+
+        .content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            animation: slideUp 1s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .season-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-color-start), var(--accent-color-end));
+            color: #000;
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0, 201, 255, 0.3);
+            animation: float 3s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color-start), var(--primary-color-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px var(--shadow-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: slideIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px var(--shadow-color);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            font-family: var(--font-family);
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color-start);
+            box-shadow: 0 0 20px rgba(106, 130, 251, 0.4);
+        }
+
+        .luck-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+        }
+
+        .luck-toggle .label-group {
+            cursor: pointer;
+        }
+        
+        .luck-toggle .label-group strong {
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        .luck-toggle .label-group span {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            display: block;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: 0.4s;
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, var(--primary-color-start), var(--primary-color-end));
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            flex: 1;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        button:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 25px rgba(0,0,0, 0.2);
+        }
+        .btn-secondary:hover {
+             background: rgba(255,255,255,0.2);
+             box-shadow: 0 12px 35px rgba(0,0,0, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color-start), var(--primary-color-end));
+            box-shadow: 0 8px 25px rgba(106, 130, 251, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 12px 35px rgba(106, 130, 251, 0.5);
+        }
+
+
+        .ai-insight {
+            background: rgba(46, 204, 113, 0.1);
+            border-color: rgba(46, 204, 113, 0.3);
+            display: none; /* Initially hidden */
+        }
+        
+        .ai-insight h3 {
+            color: #2ecc71;
+            margin-bottom: 1rem;
+        }
+
+        .ai-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+            display: none; /* Initially hidden */
+        }
+        
+        .raffle-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            transition: padding-left 0.3s ease, background 0.3s ease;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-item:hover {
+            padding-left: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .percentage {
+            font-weight: bold;
+            color: var(--primary-color-start);
+            font-size: 1.1em;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, var(--accent-color-start), var(--accent-color-end));
+            color: #000;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 201, 255, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, var(--accent-color-end));
+            border-radius: 8px;
+            transition: width 0.8s ease-out;
+            width: 0;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .loading { animation: pulse 1.5s infinite; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="content-wrapper">
+            <header class="header">
+                <div class="season-badge">🧜‍♀️ Mermaid Spins</div>
+                <h1>Blade Ball Raffle Calculator</h1>
+                <p class="subtitle">Choose between a quick estimate or a deep AI-powered simulation.</p>
+            </header>
+            
+            <div class="card input-section">
+                <div class="input-group">
+                    <label for="spins">🎰 Enter Number of Spins</label>
+                    <input type="number" id="spins" min="1" value="100" placeholder="e.g., 100">
+                </div>
+                <div class="luck-toggle">
+                    <label class="label-group" for="x2luck-checkbox">
+                        <strong>X2 Luck Active</strong>
+                        <span>Guarantees 1 Super Raffle every 20 spins!</span>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="x2luck-checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="quickCalculate()">⚡ Quick Calculate</button>
+                    <button class="btn-primary" onclick="runFullSimulation()">🤖 Analyze with AI</button>
+                </div>
+            </div>
+
+            <div class="card ai-insight" id="ai-insight">
+                <h3>🧠 AI Insight</h3>
+                <div class="ai-content" id="ai-content"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="confidence-bar"></div>
+                </div>
+            </div>
+            
+            <div class="results" id="results">
+                <div class="card raffle-section" id="normal-raffle-card">
+                    <h3>🎯 Normal Raffle (<span id="normal-spins-display"></span> Spins)</h3>
+                    <div class="result-item"><span>Golden Coin (33%)</span><span class="percentage" id="normal-coin"></span></div>
+                    <div class="result-item"><span>Mystic Blade (10%)</span><span class="percentage" id="normal-blade"></span></div>
+                    <div class="result-item"><span>Crystal Trophy (26%)</span><span class="percentage" id="normal-trophy"></span></div>
+                    <div class="result-item"><span>Mystery Box (28%)</span><span class="percentage" id="normal-box"></span></div>
+                    <div class="result-item"><span>Super Raffle (3%)</span><span class="percentage" id="normal-crate"></span></div>
+                    <div class="highlight-box"><strong>Expected Crates: <span id="expected-crates"></span></strong></div>
+                </div>
+                
+                <div class="card raffle-section" id="super-raffle-card">
+                    <h3>⭐ Super Raffle (<span id="super-spins-display"></span> Spins)</h3>
+                    <div class="result-item"><span>Flame Sword (19%)</span><span class="percentage" id="super-sword"></span></div>
+                    <div class="result-item"><span>Phoenix Blade (42%)</span><span class="percentage" id="super-lightning"></span></div>
+                    <div class="result-item"><span>Frost Katana (34%)</span><span class="percentage" id="super-katana"></span></div>
+                    <div class="result-item"><span>Mystic Token (5%)</span><span class="percentage" id="super-token"></span></div>
+                    <div class="highlight-box"><strong>Expected Tokens: <span id="expected-tokens"></span></strong></div>
+                </div>
+
+                <div class="card raffle-section" id="simulation-card" style="display: none;">
+                     <h3>🤖 AI Simulation (10,000 runs)</h3>
+                    <div class="result-item"><span>Average Super Raffle</span><span class="percentage" id="sim-crates"></span></div>
+                    <div class="result-item"><span>Average Mystic Tokens</span><span class="percentage" id="sim-tokens"></span></div>
+                    <div class="result-item"><span>Chance of ≥ 1 Token</span><span class="percentage" id="sim-chance"></span></div>
+                    <div class="result-item"><span>Best Case (Top 10% Luck)</span><span class="percentage" id="sim-best"></span></div>
+                    <div class="result-item"><span>Worst Case (Bottom 10% Luck)</span><span class="percentage" id="sim-worst"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const normalProbs = { coin: 0.33, blade: 0.10, trophy: 0.26, crate: 0.03, box: 0.28 };
+        const superProbs = { sword: 0.19, phoenix: 0.42, katana: 0.34, token: 0.05 };
+        
+        function getInputs() {
+            const spinsInput = document.getElementById('spins');
+            const spins = parseInt(spinsInput.value);
+            if (!spins || spins < 1) {
+                spinsInput.style.borderColor = '#fc5c7d';
+                return null;
+            }
+            spinsInput.style.borderColor = '';
+            const x2LuckActive = document.getElementById('x2luck-checkbox').checked;
+            return { spins, x2LuckActive };
+        }
+
+        function quickCalculate() {
+            const inputs = getInputs();
+            if (!inputs) return;
+
+            // Hide AI sections
+            document.getElementById('ai-insight').style.display = 'none';
+            document.getElementById('simulation-card').style.display = 'none';
+            document.getElementById('normal-raffle-card').style.gridColumn = '';
+            document.getElementById('super-raffle-card').style.gridColumn = '';
+            
+            const { spins, x2LuckActive } = inputs;
+            
+            let guaranteedCrates = x2LuckActive ? Math.floor(spins / 20) : 0;
+            let randomCrates = spins * normalProbs.crate;
+            let totalExpectedCrates = randomCrates + guaranteedCrates;
+
+            // Update UI
+            document.getElementById('results').style.display = 'grid';
+            document.querySelectorAll('.percentage').forEach(el => el.classList.remove('loading'));
+
+            document.getElementById('normal-spins-display').textContent = spins.toLocaleString();
+            document.getElementById('normal-coin').textContent = `~${Math.round(spins * normalProbs.coin)}`;
+            document.getElementById('normal-blade').textContent = `~${Math.round(spins * normalProbs.blade)}`;
+            document.getElementById('normal-trophy').textContent = `~${Math.round(spins * normalProbs.trophy)}`;
+            document.getElementById('normal-box').textContent = `~${Math.round(spins * normalProbs.box)}`;
+            document.getElementById('normal-crate').textContent = `~${Math.round(randomCrates)}` + (guaranteedCrates > 0 ? ` + ${guaranteedCrates}` : '');
+            document.getElementById('expected-crates').textContent = totalExpectedCrates.toFixed(2);
+            
+            document.getElementById('super-spins-display').textContent = totalExpectedCrates.toFixed(2);
+            document.getElementById('super-sword').textContent = `~${(totalExpectedCrates * superProbs.sword).toFixed(2)}`;
+            document.getElementById('super-lightning').textContent = `~${(totalExpectedCrates * superProbs.phoenix).toFixed(2)}`;
+            document.getElementById('super-katana').textContent = `~${(totalExpectedCrates * superProbs.katana).toFixed(2)}`;
+            document.getElementById('super-token').textContent = `~${(totalExpectedCrates * superProbs.token).toFixed(3)}`;
+            document.getElementById('expected-tokens').textContent = (totalExpectedCrates * superProbs.token).toFixed(3);
+        }
+
+        function runFullSimulation() {
+            const inputs = getInputs();
+            if (!inputs) return;
+
+            // Run quick calculation first for instant feedback
+            quickCalculate(); 
+
+            // Show AI sections and loading states
+            document.getElementById('simulation-card').style.display = 'block';
+            document.getElementById('normal-raffle-card').style.gridColumn = '1 / -1';
+            document.getElementById('super-raffle-card').style.gridColumn = '1 / -1';
+            document.querySelectorAll('#simulation-card .percentage').forEach(el => {
+                el.textContent = '...';
+                el.classList.add('loading');
+            });
+            document.getElementById('ai-insight').style.display = 'none';
+
+            // Use a timeout to avoid blocking the UI thread
+            setTimeout(() => {
+                const { spins, x2LuckActive } = inputs;
+                const sim = aiSimulationEngine(spins, x2LuckActive);
+
+                // Update simulation results
+                document.getElementById('sim-crates').textContent = sim.avgCrates.toFixed(2);
+                document.getElementById('sim-tokens').textContent = sim.avgTokens.toFixed(3);
+                document.getElementById('sim-chance').textContent = `${sim.tokenChance.toFixed(1)}%`;
+                document.getElementById('sim-best').textContent = `≥ ${sim.top10} Tokens`;
+                document.getElementById('sim-worst').textContent = `≤ ${sim.bottom10} Tokens`;
+                
+                // Generate and display AI Insight
+                let insight = `For <strong>${spins.toLocaleString()} spins</strong>${x2LuckActive ? " with <strong>X2 Luck</strong>" : ""}, our simulation shows:<br><br>`;
+                insight += `You have a <strong>${sim.tokenChance.toFixed(1)}% chance</strong> to get at least one Mystic Token. On average, you can expect ~<strong>${sim.avgCrates.toFixed(2)} Super Raffles</strong>, leading to ~<strong>${sim.avgTokens.toFixed(3)} tokens</strong>.<br><br>`;
+                
+                if (sim.tokenChance > 80) insight += "<strong>Verdict:</strong> Excellent odds! A token is highly likely.";
+                else if (sim.tokenChance > 50) insight += "<strong>Verdict:</strong> Good odds! It's more likely than not you'll get a token.";
+                else if (sim.tokenChance > 25) insight += "<strong>Verdict:</strong> Decent chance. Worth a shot if you feel lucky!";
+                else if (sim.tokenChance > 10) insight += "<strong>Verdict:</strong> Low chance. You'll need some good fortune on your side.";
+                else insight += "<strong>Verdict:</strong> Very unlikely. Consider saving for more spins for a better chance.";
+
+                document.getElementById('ai-content').innerHTML = insight;
+                document.getElementById('ai-insight').style.display = 'block';
+                document.getElementById('confidence-bar').style.width = '0%';
+                setTimeout(() => { // Animate the progress bar
+                    document.getElementById('confidence-bar').style.width = `${Math.min(sim.tokenChance, 100)}%`;
+                }, 100);
+
+                document.querySelectorAll('#simulation-card .percentage').forEach(el => el.classList.remove('loading'));
+            }, 250); // Short delay to allow UI to update
+        }
+
+        function aiSimulationEngine(spins, x2LuckActive) {
+            const simulations = 10000;
+            let results = [];
+            
+            for (let i = 0; i < simulations; i++) {
+                let superCrates = 0;
+                if (x2LuckActive) {
+                    superCrates += Math.floor(spins / 20);
+                }
+                
+                for (let j = 0; j < spins; j++) {
+                    if (Math.random() < normalProbs.crate) {
+                        superCrates++;
+                    }
+                }
+                
+                let tokens = 0;
+                for (let k = 0; k < superCrates; k++) {
+                    if (Math.random() < superProbs.token) {
+                        tokens++;
+                    }
+                }
+                results.push({ crates: superCrates, tokens });
+            }
+            
+            const avgCrates = results.reduce((sum, r) => sum + r.crates, 0) / simulations;
+            const avgTokens = results.reduce((sum, r) => sum + r.tokens, 0) / simulations;
+            const withToken = results.filter(r => r.tokens > 0).length;
+            const tokenChance = (withToken / simulations) * 100;
+            
+            results.sort((a, b) => a.tokens - b.tokens);
+            const bottom10 = results[Math.floor(simulations * 0.1)].tokens;
+            const top10 = results[Math.floor(simulations * 0.9)].tokens;
+            
+            return { avgCrates, avgTokens, tokenChance, top10, bottom10 };
+        }
+        
+        // Initial calculation on load
+        window.onload = () => quickCalculate();
+    </script>
+</body>
+</html>
