@@ -454,9 +454,17 @@
             
             const { spins, x2LuckActive } = inputs;
             
-            let guaranteedCrates = x2LuckActive ? Math.floor(spins / 20) : 0;
-            let randomCrates = spins * normalProbs.crate;
-            let totalExpectedCrates = randomCrates + guaranteedCrates;
+            // Calculate expected Super Raffles using correct formula
+            let totalExpectedCrates;
+            if (x2LuckActive) {
+                const guaranteedCrates = Math.floor(spins / 20);
+                const remainingSpins = spins - guaranteedCrates * 20;
+                // For X2 Luck: guaranteed crates + expected from remaining spins + expected from 5% bonus
+                totalExpectedCrates = guaranteedCrates + (remainingSpins * 0.0015) + (guaranteedCrates * 0.05);
+            } else {
+                // Correct formula: expected value for binomial distribution with p=0.0015
+                totalExpectedCrates = spins * 0.0015;
+            }
 
             // Update UI
             document.getElementById('results').style.display = 'grid';
@@ -467,7 +475,17 @@
             document.getElementById('normal-blade').textContent = `~${Math.round(spins * normalProbs.blade)}`;
             document.getElementById('normal-trophy').textContent = `~${Math.round(spins * normalProbs.trophy)}`;
             document.getElementById('normal-box').textContent = `~${Math.round(spins * normalProbs.box)}`;
-            document.getElementById('normal-crate').textContent = `~${Math.round(randomCrates)}` + (guaranteedCrates > 0 ? ` + ${guaranteedCrates}` : '');
+            
+            if (x2LuckActive) {
+                const guaranteedCrates = Math.floor(spins / 20);
+                const randomCrates = (spins - guaranteedCrates * 20) * 0.0015 + guaranteedCrates * 0.05;
+                document.getElementById('normal-crate').textContent = `~${randomCrates.toFixed(2)} + ${guaranteedCrates} guaranteed`;
+            } else {
+                // Display expected crates and probability
+                const chanceOfAtLeastOne = 1 - Math.pow(0.9985, spins);
+                document.getElementById('normal-crate').textContent = `~${(spins * 0.0015).toFixed(2)} (${(chanceOfAtLeastOne * 100).toFixed(1)}% for ≥1)`;
+            }
+            
             document.getElementById('expected-crates').textContent = totalExpectedCrates.toFixed(2);
             
             document.getElementById('super-spins-display').textContent = totalExpectedCrates.toFixed(2);
@@ -534,13 +552,32 @@
             
             for (let i = 0; i < simulations; i++) {
                 let superCrates = 0;
-                if (x2LuckActive) {
-                    superCrates += Math.floor(spins / 20);
-                }
                 
-                for (let j = 0; j < spins; j++) {
-                    if (Math.random() < normalProbs.crate) {
-                        superCrates++;
+                if (x2LuckActive) {
+                    // Guaranteed crates from X2 luck (1 every 20 spins)
+                    const guaranteedCrates = Math.floor(spins / 20);
+                    superCrates += guaranteedCrates;
+                    
+                    // Random crates from remaining spins (0.15% chance each)
+                    const remainingSpins = spins - (guaranteedCrates * 20);
+                    for (let j = 0; j < remainingSpins; j++) {
+                        if (Math.random() < 0.0015) {
+                            superCrates++;
+                        }
+                    }
+                    
+                    // Additional 5% chance for each guaranteed crate spin
+                    for (let k = 0; k < guaranteedCrates; k++) {
+                        if (Math.random() < 0.05) {
+                            superCrates++;
+                        }
+                    }
+                } else {
+                    // Regular mode: 0.15% chance per spin
+                    for (let j = 0; j < spins; j++) {
+                        if (Math.random() < 0.0015) {
+                            superCrates++;
+                        }
                     }
                 }
                 
